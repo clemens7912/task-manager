@@ -1,0 +1,7 @@
+.item{
+    @apply flex items-center h-full;
+}
+
+.item a {
+    @apply hover:underline hover:cursor-pointer;
+}

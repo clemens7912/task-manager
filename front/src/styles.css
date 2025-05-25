@@ -1,0 +1,27 @@
+/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+/* 
+Define custom colors
+Complementary: Teal
+Neutral: Gray
+Accent: Yellow
+Backgrounds: white
+*/
+@theme {
+    --color-salmon-300: #FF9E8A;
+    --color-salmon-500: #FA8072;
+    --color-salmon-700: #E96A5A;
+}
+
+/* Custom buttons */
+.btn {
+    @apply px-2 py-1 border border-gray-200 rounded-md hover:cursor-pointer;
+}
+
+.btn-primary {
+    @apply text-white bg-salmon-500 hover:bg-salmon-300;
+}
+/* End buttons */
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

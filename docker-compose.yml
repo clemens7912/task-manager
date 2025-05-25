@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+  front:
+    build:
+      context: ./../docker-images/
+      dockerfile: DockerfileFront
+      network: host
+    image: angular
+    container_name: task-manager-front
+    #command: ["sleep","infinity"]
+    ports:
+     - 4200:4200
+    volumes:
+     - ./front:/app/front
+    networks:
+      - task-manager-net
+
+  backend:
+    build:
+      context: ./../docker-images/
+      dockerfile: DockerfileBackend
+      network: host
+    image: node
+    container_name: task-manager-backend
+    #command: ["sleep","infinity"]
+    command: ["npm", "run", "dev"]
+    ports:
+      - 7000:7000
+    environment:
+      FRONTEND_URL: http://localhost:4200
+      MYSQL_HOST: db
+      MYSQL_USERNAME: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DB: task-manager
+      PORT: 7000
+      COOKIE_SECRET: secret
+      SECRET_KEY: secretkey
+
+    volumes:
+      - ./backend:/usr/src/app/
+    networks:
+      - task-manager-net
+  db:
+    image: mysql
+    container_name: db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: task-manager
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - task-manager-net
+
+
+networks:
+  task-manager-net:
+    driver: bridge
