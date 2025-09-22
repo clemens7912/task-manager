@@ -1,0 +1,411 @@
+<div class="relative p-4 flex-1 flex flex-col overflow-x-hidden">
+    <!-- Filters and management (desktop) -->
+    <div class="hidden px-2 mt-2 mb-6 md:flex justify-between text-gray-800">
+        <div class="text-5xl flex items-center gap-3">
+            <mat-icon class="scale-160" fontIcon="list_alt_check"></mat-icon> 
+            <span class="-translate-y-0.5">{{board?.name}}</span>
+        </div>
+        <div class="flex items-center gap-6 relative z-1">
+            <!-- Filters -->
+            <button title="Filters" class="flex items-center" (click)="showFiltersDropdown = !showFiltersDropdown">
+                <mat-icon class="scale-160 hover:cursor-pointer" fontIcon="filter_list"></mat-icon>
+            </button>
+            <!-- Filters dropdown -->
+            @if (showFiltersDropdown) {
+                <div class="absolute right-0 top-full min-w-40 flex flex-col bg-gray-200 border border-gray-300 shadow-2xl rounded-xl">
+                    <!-- Tags filter-->
+                    <div class="relative w-full">
+                        <div class="p-2 flex justify-between items-center hover:cursor-pointer" 
+                            (click)="showTagsFiltersDropdown = !showTagsFiltersDropdown">
+
+                            <span class="text-2xl">Tags</span>
+                            <mat-icon fontIcon="{{!showTagsFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}" 
+                                class="translate-y-0.5"></mat-icon>
+                        </div>
+                        @if (showTagsFiltersDropdown) {
+                            <div class="absolute right-full top-0 me-0.5 flex flex-col items-start gap-4 p-4 bg-gray-200 
+                                border border-gray-300 shadow-2xl rounded-xl">
+    
+                                @for (tag of tags; track tag.id) {
+                                    <div class="w-full flex justify-between items-center gap-4">
+                                        <span class="label bg-{{tag.color}} text-white hover:cursor-pointer"
+                                            (click)="toggleTagFilter(tag.id!)">
+
+                                            {{tag.name}}
+                                        </span> 
+                                        
+                                        @if (filters.cards_tags_id && (filters.cards_tags_id.value.includes(tag.id!))) {
+                                            <span>
+                                                <mat-icon fontIcon="check"></mat-icon>
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <!-- Users filter -->
+                    <div class="relative w-full">
+                        <div class="p-2 flex justify-between items-center hover:cursor-pointer" 
+                            (click)="showUsersFiltersDropdown = !showUsersFiltersDropdown">
+
+                            <span class="text-2xl">Users</span>
+                            <mat-icon fontIcon="{{!showUsersFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}" 
+                                class="translate-y-0.5"></mat-icon>
+                        </div>
+                        @if(showUsersFiltersDropdown){
+                            <div class="absolute right-full top-0 me-0.5 w-max max-h-60 overflow-y-auto flex flex-col items-start gap-4 p-4 bg-gray-200 
+                                border border-gray-300 shadow-2xl rounded-xl">
+    
+                                @for (user of board?.users; track user.id) {
+                                    <div class="flex items-center gap-1 hover:cursor-pointer" (click)="toggleUserFilter(user.id)">
+                                        <div class="w-[40px] h-[40px] flex justify-center items-center 
+                                            border border-salmon-500 rounded-full">
+                                            {{user.name | initials}}
+                                        </div>
+                                        <div class="text-lg">
+                                            {{user.name}}
+                                        </div>
+                                        @if (filters.cards_users_id && (filters.cards_users_id.value.includes(user.id!))) {
+                                            <mat-icon fontIcon="check" class="text-green-400"></mat-icon>
+                                        }
+                                    </div>
+                                }
+                            </div>
+    
+                        }
+                    </div>
+                    <!-- End Date filter -->
+                    <div class="relative w-full">
+                        <div class="p-2 flex justify-between items-center hover:cursor-pointer" 
+                            (click)="showDateFiltersDropdown = !showDateFiltersDropdown">
+
+                            <span class="text-2xl">Due date</span>
+                            <mat-icon fontIcon="{{!showDateFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}" 
+                                class="translate-y-0.5"></mat-icon>
+                        </div>
+                        @if(showDateFiltersDropdown){
+                            <div class="absolute right-full top-0 me-0.5 w-max flex flex-col items-start gap-4 p-4 bg-gray-200 
+                                border border-gray-300 shadow-2xl rounded-xl">
+
+                                <div class="form-group w-full">
+                                    <label for="startDate">Start</label>
+                                    <input type="date" id="startDate" [(ngModel)]="filterStartDate"
+                                    (change)="startDateFilterChange()">
+                                </div>
+                                <div class="form-group w-full">
+                                    <label for="endDate">End</label>
+                                    <input type="date" id="endDate" [(ngModel)]="filterEndDate"
+                                        (change)="endDateFilterChange()" [disabled]="filterStartDate === ''">
+                                </div>
+                                
+                            </div>
+    
+                        }
+                    </div>
+                    <!-- Search -->
+                    <div class="w-full p-2 flex justify-center items-center">
+                        <button type="button" class="btn btn-primary flex justify-center items-center gap-2"
+                            (click)="search($event)">
+
+                            <mat-icon fontIcon="search"></mat-icon>
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </div>
+            }
+            <!-- Members -->
+            <button title="Members" class="flex items-center" (click)="showMembersDropdown = !showMembersDropdown">
+                <mat-icon class="scale-160 hover:cursor-pointer" fontIcon="group_add"></mat-icon>
+            </button>
+            <!-- Dropdown menu for adding members -->
+            @if(showMembersDropdown){
+                <app-user-selection [users]="board?.users || []" [board]="true" [owner]="owner"
+                        (addUser)="addMember($event)"
+                        (deleteUser)="deleteMember($event)"
+                        class="max-h-[300px] mt-2 absolute top-full right-0 bg-gray-200 
+                            border border-gray-300 rounded-xl shadow-xl"></app-user-selection>
+            }
+            @if(owner){
+                <!-- Tags -->
+                <button title="Tags" class="flex items-center" (click)="showTagsDropdown = !showTagsDropdown">
+                    <mat-icon class="scale-160 hover:cursor-pointer" fontIcon="label"></mat-icon>
+                </button>
+                <!-- Dropdoown menu for tag creation-->
+                @if(showTagsDropdown){
+                    <div class="absolute right-0 top-full flex flex-col bg-gray-200 border border-gray-300 shadow-2xl rounded-xl">
+                        @for (tag of tags; track tag.name) {
+                            <div class="flex items-center justify-between">
+                                <div class="p-2">
+                                    <div class="relative w-10 h-10 bg-{{tag.color}} rounded-md hover:cursor-pointer" 
+                                        (click)="toggleColorPicker($index)">
+        
+                                        @if(activeColorPicker == $index){
+                                            <div class="absolute top-full right-1/2 translate-x-1/2 mt-0.5 z-2">
+                                                <app-color-picker (colorChange)="onColorChange($event, $index)"></app-color-picker>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <input type="text" [(ngModel)]="tag.name" 
+                                    class="mx-2 w-[100px] text-xl text-center bg-transparent border-0 focus:border-0 focus:outline-0"
+                                    (keyup.enter)="saveTag($index, $event)">
+                                <div class="flex items-center">
+                                    <button (click)="saveTag($index)" class="flex items-center" title="Add tag">
+                                        <mat-icon fontIcon="save"></mat-icon>
+                                    </button>
+                                    <button (click)="deleteTag($index)" class="flex items-center text-red-700" title="Delete tag">
+                                        <mat-icon fontIcon="close"></mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+        
+                        <div class="min-w-32 my-2 flex items-center justify-center text-gray-500
+                            hover:cursor-pointer hover:bg-gray-200" (click)="addTag()">
+            
+                            <mat-icon fontIcon="add"></mat-icon>
+                            <span>Add tag</span>
+                        </div>
+            
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Filters and management (phone)-->
+    <div class="md:hidden px-2 mt-2 mb-6 flex justify-between text-gray-800">
+        <div class="text-4xl flex items-center gap-3">
+            <mat-icon fontIcon="list_alt_check"></mat-icon>
+            <span class="-translate-y-0.5">{{board?.name}}</span>
+        </div>
+        <!-- Management button -->
+        <button type="button" title="Management" class="flex items-center" (click)="showManagementMenu = !showManagementMenu">
+            <mat-icon fontIcon="settings"></mat-icon>
+        </button>
+        <!-- Management menu -->
+        <div id="management-menu" class="absolute top-0 right-0 bottom-0 z-2 mb-4 w-max min-w-2/3 flex flex-col items-start
+            text-white bg-teal-400 border-t border-gray-200 shadow-[-5px_0_10px_rgba(0,0,0,0.3)]
+            transition-all duration-1000"
+            [ngClass]="{
+                'translate-x-full opacity-0': !showManagementMenu,
+                'translate-x-0 opacity-100': showManagementMenu
+            }">
+            <div class="py-1 px-1 w-full flex justify-end items-center">
+                <button type="button" title="Close management" (click)="showManagementMenu = !showManagementMenu">
+                    <mat-icon fontIcon="close"></mat-icon>
+                </button>
+            </div>
+            <!-- Members -->
+            <div class="item" [ngClass]="{'border-b border-gray-200': showMembersDropdown}">
+                <div class="header" (click)="showMembersDropdown = !showMembersDropdown">
+                    <div class="flex justify-start items-center gap-1">
+                        <mat-icon fontIcon="group_add"></mat-icon>
+                        <span class="-translate-y-0.5">Members</span>
+                    </div>
+                    <mat-icon fontIcon="{{!showMembersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}"></mat-icon>
+                </div>
+                
+                @if(showMembersDropdown){
+                    <div class="menu ">
+                        <app-user-selection [users]="board?.users || []" [board]="true" [owner]="owner" [phone]="true"
+                            (addUser)="addMember($event)"
+                            (deleteUser)="deleteMember($event)"
+                            class="max-w-full w-max max-h-[300px] overflow-x-auto"></app-user-selection>
+                    </div>
+                }
+            </div>
+            <!-- Tags -->
+            @if(owner){
+                <div class="item" [ngClass]="{'border-b border-gray-200': showTagsDropdown}">
+                    <div class="header" (click)="showTagsDropdown = !showTagsDropdown">
+                        <div class="flex justify-start items-center gap-1">
+                            <mat-icon fontIcon="label"></mat-icon>
+                            <span class="-translate-y-0.5">Tags</span>
+                        </div>
+                        <mat-icon fontIcon="{{!showTagsDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}"></mat-icon>
+                    </div>
+                    
+                    @if(showTagsDropdown){
+                        <div class="w-full flex flex-col">
+                            @for(tag of tags; track tag.name){
+                                <div class="flex items-center justify-between">
+                                    <div class="p-2">
+                                        <div class="relative w-10 h-10 bg-{{tag.color}} rounded-md hover:cursor-pointer" 
+                                            (click)="toggleColorPicker($index)">
+            
+                                            @if(activeColorPicker == $index){
+                                                <div class="absolute top-full right-1/2 translate-x-1/2 mt-0.5 z-2">
+                                                    <app-color-picker (colorChange)="onColorChange($event, $index)"></app-color-picker>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <input type="text" [(ngModel)]="tag.name" 
+                                        class="mx-2 w-[100px] text-xl text-center bg-transparent border-0 focus:border-0 focus:outline-0"
+                                        (keyup.enter)="saveTag($index, $event)">
+                                    <div class="flex items-center">
+                                        <button (click)="saveTag($index)" class="flex items-center" title="Add tag">
+                                            <mat-icon fontIcon="save"></mat-icon>
+                                        </button>
+                                        <button (click)="deleteTag($index)" class="flex items-center text-red-700" title="Delete tag">
+                                            <mat-icon fontIcon="close"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="min-w-32 my-2 flex items-center justify-center
+                                hover:cursor-pointer" (click)="addTag()">
+                
+                                <mat-icon fontIcon="add"></mat-icon>
+                                <span>Add tag</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            <!--Filters-->
+            <div class="item" [ngClass]="{'border-b border-gray-200': showFiltersDropdown}">
+                <div class="header" (click)="showFiltersDropdown = !showFiltersDropdown">
+                    <div class="flex justify-start items-center gap-1">
+                        <mat-icon fontIcon="filter_list"></mat-icon>
+                        <span class="-translate-0.5">Filters</span>
+                    </div>
+                    <mat-icon fontIcon="{{!showFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}"></mat-icon>
+                </div>
+
+                @if(showFiltersDropdown){
+                    <div class="w-full pl-4">
+                        <!-- Tags filter-->
+                        <div class="relative w-full">
+                            <div class="p-2 flex justify-between items-center hover:cursor-pointer" 
+                                (click)="showTagsFiltersDropdown = !showTagsFiltersDropdown">
+
+                                <span class="text-2xl">Tags</span>
+                                <mat-icon fontIcon="{{!showTagsFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}" 
+                                    class="translate-y-0.5"></mat-icon>
+                            </div>
+                            @if (showTagsFiltersDropdown) {
+                                <div class="me-0.5 flex flex-col items-start gap-4 p-4">
+        
+                                    @for (tag of tags; track tag.id) {
+                                        <div class="w-full flex justify-between items-center gap-4">
+                                            <span class="label bg-{{tag.color}} text-white hover:cursor-pointer"
+                                                (click)="toggleTagFilter(tag.id!)">
+
+                                                {{tag.name}}
+                                            </span> 
+                                            
+                                            @if (filters.cards_tags_id && (filters.cards_tags_id.value.includes(tag.id!))) {
+                                                <span>
+                                                    <mat-icon fontIcon="check"></mat-icon>
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <!-- Users filter -->
+                        <div class="relative w-full">
+                            <div class="p-2 flex justify-between items-center hover:cursor-pointer" 
+                                (click)="showUsersFiltersDropdown = !showUsersFiltersDropdown">
+
+                                <span class="text-2xl">Users</span>
+                                <mat-icon fontIcon="{{!showUsersFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}" 
+                                    class="translate-y-0.5"></mat-icon>
+                            </div>
+                            @if(showUsersFiltersDropdown){
+                                <div class="me-0.5 w-max max-h-60 overflow-y-auto flex flex-col items-start gap-4 p-4">
+        
+                                    @for (user of board?.users; track user.id) {
+                                        <div class="flex items-center gap-1 hover:cursor-pointer" (click)="toggleUserFilter(user.id)">
+                                            <div class="w-[40px] h-[40px] flex justify-center items-center 
+                                                border border-white rounded-full">
+                                                {{user.name | initials}}
+                                            </div>
+                                            <div class="text-lg">
+                                                {{user.name}}
+                                            </div>
+                                            @if (filters.cards_users_id && (filters.cards_users_id.value.includes(user.id!))) {
+                                                <mat-icon fontIcon="check" class="text-green-400"></mat-icon>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+        
+                            }
+                        </div>
+                        <!-- End Date filter -->
+                        <div class="relative w-full">
+                            <div class="p-2 flex justify-between items-center hover:cursor-pointer" 
+                                (click)="showDateFiltersDropdown = !showDateFiltersDropdown">
+
+                                <span class="text-2xl">Due date</span>
+                                <mat-icon fontIcon="{{!showDateFiltersDropdown ? 'keyboard_arrow_right' : 'keyboard_arrow_down'}}" 
+                                    class="translate-y-0.5"></mat-icon>
+                            </div>
+                            @if(showDateFiltersDropdown){
+                                <div class="me-0.5 w-max flex flex-col items-start gap-4 p-4">
+
+                                    <div class="form-group w-full">
+                                        <label for="startDate" class="!text-white">Start</label>
+                                        <input type="date" id="startDate" class="text-gray-800" [(ngModel)]="filterStartDate"
+                                        (change)="startDateFilterChange()">
+                                    </div>
+                                    <div class="form-group w-full">
+                                        <label for="endDate" class="!text-white">End</label>
+                                        <input type="date" id="endDate" class="text-gray-800" [(ngModel)]="filterEndDate"
+                                            (change)="endDateFilterChange()" [disabled]="filterStartDate === ''">
+                                    </div>
+                                </div>
+        
+                            }
+                        </div>
+                        <!-- Search -->
+                        <div class="w-full p-2 flex justify-center items-center">
+                            <button type="button" class="btn btn-primary flex justify-center items-center gap-2 !border-white
+                                    !shadow-none"
+                                (click)="search($event)">
+
+                                <mat-icon fontIcon="search"></mat-icon>
+                                <span>Search</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Columns with tasks -->
+    <div class="board flex-1 w-full max-w-full overflow-auto flex justify-start gap-10
+        snap-x snap-mandatory md:snap-none" cdkDropListGroup>
+        
+        @for (column of columns; track column.id) {
+            <div class="mb-6 w-full shrink-0 snap-start md:w-auto md:shrink-1">
+                <app-column [column]="column" [availableColumns]="columns"></app-column>
+            </div>
+        }
+    
+        <div class="w-full max-w-full md:!w-[400px] md:!max-w-[400px] h-10 p-2 flex justify-start items-center shrink-0
+                snap-start border border-gray-200 shadow-xl rounded-t-2xl bg-salmon-500 
+                text-white text-2xl font-bold">
+    
+            @if(!editingColumn){
+                <span (click)="startEditingColumn()" class="w-full h-full flex items-center 
+                            hover:cursor-pointer">
+    
+                    Add new column...
+                </span>
+            } @else {
+                <input type="text" class="bg-transparent border-0 focus:border-0 focus:outline-0" 
+                    placeholder="Column name" 
+                    [(ngModel)]="columnName" (keydown.enter)="createColumn()" 
+                    (blur)="cancel()" #columnInput>
+            }
+        </div>
+    </div>
+</div>

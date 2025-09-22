@@ -1,0 +1,5 @@
+@import './../../../assets/styles/theme.css';
+
+hr {
+    @apply border-t-1 border-gray-300;
+}

@@ -1,31 +1,147 @@
-<header class="w-full h-[70px] bg-teal-400 text-white flex justify-center">
-    <div class="lg:w-4xl xl:w-6xl 2xl:w-7xl h-[70px] flex justify-between items-center">
+<header class="fixed z-3 top-0 left-0 w-full h-[70px] bg-teal-400 text-white flex justify-center px-2">
+    <div class="w-full lg:w-4xl xl:w-6xl 2xl:w-7xl h-[70px] flex justify-between items-center">
         <div class="app-title h-full flex items-center text-2xl">
-            <mat-icon fontIcon="assignment"></mat-icon>
+            <span class="flex items-center translate-y-0.5"><mat-icon fontIcon="assignment"></mat-icon></span>
             <span id="app-name" class="ml-1">Tracker</span>
         </div>
-        <div class="flex justify-between items-center h-full">
-            <nav class="flex justify-between items-center gap-20 text-2xl h-full">
-                <div class="item relative group hover:cursor-pointer">
-                    {{boards[0]}} <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
-                    <div class="absolute left-0 flex flex-col items-center justify-evenly gap-[10px] bg-white
-                            shadow-xl border border-gray-200 rounded-md text-gray-800 w-max 
-                            -top-full group-hover:top-full opacity-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out">
-                        @for (board of boards; track $index) {
-                            <a [routerLink]="['/']" routerLinkActive="router-link-active" class="w-full px-2 py-1 hover:bg-gray-100">{{board}}</a>
-                        }
-                    </div>
-                </div>
-                <div class="item">
-                    <a [routerLink]="['/']" routerLinkActive="router-link-active">Tasks</a>
-                </div>
-                <div class="item">
-                    <a [routerLink]="['/']" routerLinkActive="router-link-active">Calendar</a>
-                </div>
-            </nav>
-            <div class="ml-20 flex items-center">
-                <mat-icon fontIcon="account_circle"></mat-icon>
+
+        <!-- Desktop menu -->
+        <div class="big-menu hidden md:flex justify-between items-center h-full">
+            @if (user) {
+                <nav class="flex justify-between items-center gap-20 text-2xl h-full">
+                    @if (boards && boards.length > 0) {
+                        <div class="item relative group hover:cursor-pointer">
+                            {{boards[selectedBoard].name}} <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
+                            <div class="absolute z-2 left-0 flex flex-col items-center justify-evenly gap-[10px] bg-white
+                                    shadow-xl border border-gray-200 rounded-md text-gray-800 w-max 
+                                    -top-full group-hover:top-full opacity-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out">
+                                @for (board of boards; track $index) {
+                                    <a [routerLink]="['/board', board.id]" routerLinkActive="router-link-active" (click)="selectBoard($index)" 
+                                        class="w-full px-2 py-1 hover:bg-gray-100">{{board.name}}</a>
+                                }
+                                <button class="w-full px-2 py-1 hover:bg-gray-100 hover:cursor-pointer" (click)="openCreateBoardDialog(true)">
+                                    -- Create Board --
+                                </button>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <a [routerLink]="['/']" routerLinkActive="router-link-active">Tasks</a>
+                        </div>
+                        <div class="item">
+                            <a [routerLink]="['/']" routerLinkActive="router-link-active">Calendar</a>
+                        </div>
+                    }
+                    @else {
+                        <div class="item z-2 hover:cursor-pointer" (click)="openCreateBoardDialog()">
+                            <mat-icon fontIcon="add"></mat-icon> Create Board
+                        </div>
+                    }
+                    
+                </nav>
+            }
+            <div class="ml-20 flex items-center relative h-full">    
+                @if (!user) { <!-- logged out-->
+                    <button type="button" class="flex items-center hover:cursor-pointer">
+                        <mat-icon fontIcon="account_circle" (click)="openAuthDialog()"></mat-icon>
+                    </button>
+                }
+                @else { <!-- logged in-->
+                    <button type="button" class="w-10 h-10 p-2 flex justify-center items-center text-2xl border-1 border-gray-100
+                        rounded-full hover:cursor-pointer z-2" (click)="showUserInfo = !showUserInfo">
+
+                            {{ user.name | initials }}
+                            
+                            <div class="absolute p-2 -top-[500px] opacity-0 right-0 flex flex-col bg-white border border-gray-200 rounded-md
+                                                text-gray-800 w-max shadow-xl transition-all duration-700 ease-in-out" 
+                                                [ngClass]="{'top-full opacity-100': showUserInfo}">
+        
+                                <div class="w-full flex flex-col items-start">
+                                    <span class="text-xl">{{user.name}}</span>
+                                    <span class="text-lg text-yellow-700">{{user.email}}</span>
+                                </div>
+                                <hr class="my-2 border border-gray-200">
+                                <div class="flex justify-center">
+                                    <button type="button" class="btn btn-primary text-base flex items-center" (click)="logout()">
+                                        <mat-icon  fontIcon="logout"></mat-icon> Logout
+                                    </button>
+                                </div>
+                            </div>
+                    </button>
+                    <!--Dropdown menu for logged in button -->
+                }
+                
             </div>
         </div>
+
+        <!-- Small devices menu -->
+        @if(user){
+            <div class="small-menu md:hidden h-full flex items-center bg-teal-400">
+                <button class="flex items-center z-1" (click)="showSmallMenu = !showSmallMenu">
+                    <mat-icon fontIcon="menu"></mat-icon>   
+                    <!--Small devices nav-->
+                </button>
+                <nav class="absolute right-0 left-0 flex flex-col border-t border-gray-200 shadow-2xl bg-teal-400 transition-all duration-1000"
+                        [ngClass]="{
+                            '-top-2/1 opacity-0': !showSmallMenu,
+                            'top-full opacity-100': showSmallMenu
+                        }">
+
+                    @if(boards && boards.length > 0){
+                        <div class="relative">
+                            <div class="item justify-start items-center" (click)="showBoardsDropdown = !showBoardsDropdown">
+                                {{boards[0].name}} <mat-icon fontIcon="keyboard_arrow_down"></mat-icon>
+                            </div>
+                            <div class="relative top-full left-10 right-0 flex-col items-start gap-2.5 
+                                        transition-all duration-1000 ease-in-out"
+                                [ngClass]="{
+                                    'hidden': !showBoardsDropdown,
+                                    'flex': showBoardsDropdown
+                                }">
+    
+                                @for (board of boards; track $index) {
+                                    <a [routerLink]="['/board', board.id]" routerLinkActive="router-link-active" class="w-full px-2 py-1 hover:bg-gray-100">{{board.name}}</a>
+                                }
+
+                                <button class="w-full px-2 py-1 hover:bg-gray-100 text-start" (click)="openCreateBoardDialog(true)">
+                                    -- Create Board --
+                                </button>
+                            </div>
+    
+                        </div>
+                        <div class="item">
+                            <a [routerLink]="['/']" routerLinkActive="router-link-active">Tasks</a>
+                        </div>
+                        <div class="item">
+                            <a [routerLink]="['/']" routerLinkActive="router-link-active">Calendar</a>
+                        </div>
+                    }
+                    @else {
+                        <div class="item" (click)="openCreateBoardDialog(true)">
+                            <mat-icon fontIcon="add"></mat-icon> Create Board
+                        </div>
+                    }
+
+                    <div class="item gap-2 pr-2">
+                        <button type="button" class="w-10 h-10 p-2 flex justify-center items-center text-2xl border-1 border-gray-100 rounded-full">
+                            {{ user.name | initials }}
+                        </button>
+                        <div class="flex flex-col items-start">
+                            <span class="text-xl">{{user.name}}</span>
+                            <span class="text-lg">{{user.email}}</span>
+                        </div>
+                        <button class="ml-auto" (click)="logout()">
+                            <mat-icon class="scale-125" fontIcon="logout"></mat-icon>
+                        </button>
+                    </div>
+                </nav>
+            </div>
+        }
+        @else {
+            <div class="h-full flex items-center md:hidden">
+                <button type="button" class="flex items-center">
+                    <mat-icon fontIcon="account_circle" (click)="openAuthDialog()"></mat-icon>
+                </button>
+            </div>
+        }
     </div>
 </header>

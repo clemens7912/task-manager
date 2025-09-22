@@ -1,27 +1,157 @@
 /* You can add global styles to this file, and also import other style files */
-@import "tailwindcss";
+@import "./assets/styles/theme.css";
 
-/* 
-Define custom colors
-Complementary: Teal
-Neutral: Gray
-Accent: Yellow
-Backgrounds: white
-*/
-@theme {
-    --color-salmon-300: #FF9E8A;
-    --color-salmon-500: #FA8072;
-    --color-salmon-700: #E96A5A;
-}
+/* config safelist */
+@source inline("{hover:,}bg-{red,yellow,lime,cyan,blue,rose}-{300,500,700}");
 
 /* Custom buttons */
+button{
+    @apply hover:cursor-pointer;
+}
+
 .btn {
-    @apply px-2 py-1 border border-gray-200 rounded-md hover:cursor-pointer;
+    @apply px-2 py-1 border border-gray-200 rounded-md enabled:hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-primary {
-    @apply text-white bg-salmon-500 hover:bg-salmon-300;
+    @apply text-white bg-salmon-500 enabled:hover:bg-salmon-300;
+}
+
+.btn-danger {
+    @apply text-white bg-red-500 enabled:hover:bg-red-300;
 }
 /* End buttons */
+
+/*customize dialogs*/
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  max-width: unset !important; /* Removes default max-width */
+  min-width: 0 !important; /* Removes default min-width */
+}
+
+.dialog-responsive {
+    @apply relative w-dvw max-w-dvw md:w-[600px] lg:w-[800px] xl:w-[900px] 2xl:w-[900px] min-h-[500px];
+}
+
+.dialog-sm {
+    @apply relative w-full md:w-[400px] min-h-[400px];
+}
+/* end dialogs */
+
+/* forms styles */
+
+.form-group.vertical {
+    @apply flex flex-col justify-center items-start gap-1;
+}
+
+.form-group label {
+    @apply text-gray-900 font-bold group-[.invalid]:text-red-500;
+}
+
+.form-group input {
+    @apply w-full h-8 px-2 placeholder-gray-500 bg-white border border-gray-300 rounded-lg focus:outline-none 
+        focus:border-salmon-500 focus:shadow-lg focus:shadow-salmon-300/50 
+        group-[.invalid]:border-red-500
+        disabled:bg-gray-100 disabled:hover:cursor-not-allowed;
+}
+
+.form-group .error-message {
+    @apply text-red-500 font-semibold;
+}
+
+.input-group {
+
+}
+
+.input-group .input-icon {
+    @apply absolute top-0 bottom-0 start-0 flex items-center ps-1;
+}
+
+.input-group input {
+    @apply ps-8;
+}
+
+/* end of forms*/
+
+/* table styling */
+
+.table-container{
+    @apply border border-gray-200 rounded-lg overflow-hidden;
+}
+
+.table {
+    @apply table-auto w-full border-collapse;
+
+    & thead tr {
+        @apply bg-teal-400 text-white;
+
+        & th{
+            @apply px-2 py-1;
+        }
+
+    }
+
+    & tbody tr {
+        @apply odd:bg-gray-100 even:bg-white;
+
+        & td {
+            @apply px-2 py-1;
+        }
+    }
+}
+
+
+/* end of table styling */
+
+/* labels */
+
+.label {
+    @apply p-1 text-sm rounded-md;
+
+    &.label-primary{
+        @apply bg-salmon-500 text-white;
+    }
+
+    &.label-secondary{
+        @apply bg-teal-400 text-white; 
+    }
+
+    &.label-danger {
+        @apply bg-red-600 text-white;
+    }
+
+    &.label-default {
+        @apply bg-gray-400 text-white;
+    }
+
+    &.remove {
+        @apply after:content-['X'] after:pl-2 hover:opacity-70 hover:cursor-pointer;
+    }
+}
+
+/* end of labels*/
+
+/* Popover */
+.popover {
+    @apply absolute left-full top-1/2 -translate-y-1/2 ms-2 px-2 py-2 w-max
+        hidden flex-col group-hover:flex
+        bg-gray-200 border border-gray-300 rounded-xl shadow-xl
+        before:content-[''] before:w-[10px] before:h-[10px] before:absolute
+        before:top-1/2 before:right-full before:translate-x-[5px] before:-translate-y-1/2 
+        before:rotate-45 before:bg-gray-200 before:border before:border-gray-300 
+        before:border-r-transparent before:border-t-transparent;
+
+    /* &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        width: 10px;
+        height: 10px;
+        transform: rotate(-45deg) translateY(-50%) translateX(5px);
+        background-color: red;
+    }    */             
+}
+/* end of popover*/
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

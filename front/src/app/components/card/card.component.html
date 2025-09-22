@@ -1,0 +1,29 @@
+<div class="card">
+    <button type="button" class="delete" (click)="delete($event)">
+        <mat-icon class="text-red-500" fontIcon="close"></mat-icon>
+    </button>
+    <div class="tags">
+        @for (tag of card.tags; track tag.id) {
+            <span class="label bg-{{tag.color}} text-white">{{tag.name}}</span>
+        }
+    </div>
+    <hr>
+    <div class="description">
+        {{card.shortDescription}}
+    </div>
+    <hr>
+    <div class="footer">
+        <div class="due-date">
+            <mat-icon fontIcon="calendar_month"></mat-icon>
+            {{card.endDate || 'No due date'}}
+        </div>
+        <div class="assigned">
+            @for (user of card.users; track user.id) {
+                <div>
+                    {{user.name | initials}}
+                </div>
+            }
+        </div>
+    </div>
+
+</div>

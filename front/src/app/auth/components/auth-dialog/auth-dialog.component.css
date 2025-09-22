@@ -1,0 +1,10 @@
+@import "./../../../../assets/styles/theme.css";
+
+
+.tab-item {
+    @apply text-2xl font-bold border-b-4 border-transparent transition-all duration-500 hover:cursor-pointer;
+}
+
+.tab-item.active {
+    @apply border-b-4 border-salmon-500;
+}

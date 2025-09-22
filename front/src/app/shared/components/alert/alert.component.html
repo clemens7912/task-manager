@@ -1,0 +1,12 @@
+@if (message) {
+    <div class="absolute z-2000 top-8/9 left-1/2 -translate-1/2 max-w-[400px] md:max-w-[800px]">
+        <div class="alert alert-{{level}}">
+            <button class="hover:cursor-pointer absolute top-1 right-1" (click)="dismiss()">
+                <mat-icon fontIcon="close" class="transition duration-300 hover:scale-125"></mat-icon>
+            </button>
+            <div class="flex items-center">
+                {{message}}
+            </div>
+        </div>
+    </div>
+}

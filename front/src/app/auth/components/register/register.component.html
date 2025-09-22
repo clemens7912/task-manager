@@ -1,0 +1,81 @@
+
+<div class="flex justify-center">
+    <form [formGroup]="registerForm" (ngSubmit)="submit($event)" class="flex flex-col items-stretch">
+        <div class="form-group vertical group" [ngClass]="{'invalid': name?.invalid && (name?.touched || name?.dirty) }">
+            <label for="name">Name: </label>
+            <div class="input-group relative">
+                <div class="input-icon">
+                    <mat-icon fontIcon="account_circle"></mat-icon>
+                </div>
+                <input type="text" id="name" formControlName="name" autocomplete="off">
+            </div>
+            @if (name?.invalid && (name?.touched || name?.dirty)) {
+                <div class="error-message">
+                    @if (name?.errors?.['required']) {
+                        <div>Name is required</div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="form-group vertical mt-3 group" [ngClass]="{'invalid': email?.invalid && (email?.touched || email?.dirty) }">
+            <label for="email">Email: </label>
+            <div class="input-group relative">
+                <div class="input-icon">
+                    <mat-icon fontIcon="email"></mat-icon>
+                </div>
+                <input type="text" id="email" formControlName="email" autocomplete="off">
+            </div>
+            @if (email?.invalid && (email?.touched || email?.dirty)) {
+                <div class="error-message">
+                    @if (email?.errors?.['required']) {
+                        <div>Email is required</div>
+                    }
+                    @if(email?.errors?.['email']){
+                        <div>Email is not valid</div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="form-group vertical mt-3 group" [ngClass]="{'invalid': password?.invalid && (password?.touched || password?.dirty) }">
+            <label for="password">Password: </label>
+            <div class="input-group relative">
+                <div class="input-icon">
+                    <mat-icon fontIcon="lock"></mat-icon>
+                </div>
+                <input type="password" id="password" formControlName="password" autocomplete="off">
+            </div>
+            @if (password?.invalid && (password?.touched || password?.dirty)) {
+                <div class="error-message">
+                    @if (password?.errors?.['required']) {
+                        <div>Password is required</div>
+                    }
+                    @if(password?.errors?.['pattern']){
+                        <div>Password is not valid</div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="form-group vertical mt-3 group" [ngClass]="{'invalid': passwordRepeat?.invalid && (passwordRepeat?.touched || passwordRepeat?.dirty) }">
+            <label for="passwordRepeat">Repeat password: </label>
+            <div class="input-group relative">
+                <div class="input-icon">
+                    <mat-icon fontIcon="lock"></mat-icon>
+                </div>
+                <input type="password" id="passwordRepeat" formControlName="passwordRepeat" autocomplete="off">
+            </div>
+            @if (passwordRepeat?.invalid && (passwordRepeat?.touched || passwordRepeat?.dirty)) {
+                <div class="error-message">
+                    @if (passwordRepeat?.errors?.['required']) {
+                        <div>Password is required</div>
+                    }
+                    @if(passwordRepeat?.errors?.['passwordMismatch']){
+                        <div>Password must be identical</div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="mt-3 flex justify-center">
+            <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">Register</button>
+        </div>
+    </form>
+</div>

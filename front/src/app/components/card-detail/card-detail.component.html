@@ -1,0 +1,139 @@
+<div class="p-4 flex flex-col grow-1">
+    <form [formGroup]="form" (ngSubmit)="save($event)">
+        <!-- Title (short description) -->
+        <div class="px-1 py-2 flex items-center gap-2 basis-0 grow-1">
+            <mat-icon fontIcon="comment" class="scale-120 translate-y-0.5"></mat-icon>
+            <input type="text" formControlName="shortDescription" 
+                placeholder="Description"
+                class="mx-4 w-full text-xl text-start placeholder-gray-500 bg-transparent border-0 
+                    focus:border-0 focus:outline-0">
+        </div>
+        <hr class="my-2">
+
+        <!-- Column -->
+        @if(card.id){
+            <div class="px-1 py-2 flex items-center gap-2 basis-0 grow-1">
+                <mat-icon fontIcon="list" class="scale-120 translate-y-0.5"></mat-icon>
+                <select name="column" id="column" formControlName="columnId"
+                    class="mx-4 p-2 min-w-40 text-xl text-start placeholder-gray-500 bg-transparent 
+                        border border-gray-300 focus:border-salmon-500 focus:shadow-lg focus:shadow-salmon-300/50
+                        focus:outline-0 rounded-xl hover:cursor-pointer">
+                    @for (column of availableColumns; track column.id) {
+                        <option value="{{column.id}}">{{ column.name }}</option>
+                    }
+                </select>
+            </div>
+            <hr class="my-2">
+        }
+
+        <!-- Tags -->
+        <div class="px-1 py-2 flex items-center gap-2 grow-1">
+            <div class="relative me-2">
+                <button type="button" (click)="tagsDropdown = !tagsDropdown" class="flex items-center">
+                    <mat-icon fontIcon="new_label" class="scale-150"></mat-icon>
+                </button>
+                @if (tagsDropdown) {
+                    <!-- Dropdown to choose tags -->
+                    <div class="z-2 absolute top-full left-0 mt-2 p-2 w-max min-w-24 max-h-28 overflow-y-auto 
+                        flex flex-col items-start gap-4
+                        bg-gray-200 border border-gray-300 rounded-md shadow-xl">
+    
+                        @for(tag of differentTags(); track tag.id){
+                            <div>
+                                <span class="label bg-{{tag.color}} text-white hover:cursor-pointer" (click)="addTag(tag, $index)">
+                                    {{tag.name}}
+                                </span> 
+                            </div>
+                        }
+                        @empty {
+                            <div>
+                                No tags available
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            @for (tag of selectedTags; track tag) {
+                <span class="label bg-{{tag.color}} text-white remove" (click)="removeSelectedTag($index, tag)">
+                    {{tag.name}}
+                </span>
+            }
+            @empty {
+                <span class="mx-2 text-xl text-gray-500">No tags added</span>   
+            }
+        </div>
+        <hr class="my-2">
+        <!--Members-->
+        <div class="px-1 py-2 flex items-center gap-2 grow-1">
+            <div class="relative me-2">
+                <button type="button" class="flex items-center" (click)="usersDropdown = !usersDropdown">
+                    <mat-icon fontIcon="group_add" class="scale-150"></mat-icon>
+                </button>
+                @if(usersDropdown){
+                    <app-user-selection [users]="selectedUsers" [board]="false"
+                        (addUser)="onAddUser($event)"
+                        (deleteUser)="onDeleteUser($event)"
+                        class="max-h-[200px] mt-3 absolute top-full left-0 bg-gray-200 
+                            border border-gray-300 rounded-xl shadow-xl"></app-user-selection>
+                }
+            </div>
+            @for (user of selectedUsers; track user.id) {
+                <div class="w-[40px] h-[40px] flex justify-center items-center 
+                    border border-salmon-500 rounded-full" title="{{user.name}}">
+
+                    {{user.name | initials}}
+                </div>
+            }
+            @empty {
+                <span class="mx-2 text-xl text-gray-500">No users assigned</span>   
+            }
+        </div>
+        <hr class="my-2">
+        <!-- Details (Long description) -->
+        <div class="py-2 grow-1">
+            <textarea formControlName="longDescription"
+                placeholder="Details"
+                class="w-full p-2 text-start text-gray-800 placeholder-gray-500 bg-transparent 
+                    border border-gray-300 focus:border-gray-700 focus:outline-0 rounded-xl" 
+                rows="5">
+                </textarea>
+        </div>
+        <hr class="my-2">
+        <!-- Dates -->
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8 grow-1">
+            <!-- start -->
+            <div class="flex items-center gap-1">
+                <mat-icon fontIcon="calendar_month" title="Inicio"></mat-icon>
+                <input type="date" formControlName="startDate" class="px-2 py-1 border border-gray-300 focus:border-gray-700 
+                    focus:outline-0 rounded-md">
+            </div>
+            <!-- end -->
+            <div class="flex items-center gap-1">
+                <mat-icon fontIcon="calendar_month" title="Final"></mat-icon>
+                <input type="date" formControlName="endDate" class="px-2 py-1 border border-gray-300 focus:border-gray-700 
+                    focus:outline-0 rounded-md">
+            </div>
+        </div>
+        <hr class="my-2 grow-1">
+        <div class="px-1 py-2 w-full max-w-full flex justify-between items-center gap-2">
+            <div>
+                <span class="relative group flex items-center">
+                    <mat-icon fontIcon="info" class="relative scale-125 !text-cyan-300 hover:cursor-pointer"></mat-icon>
+                    <!-- Popover -->
+                    <div class="popover">
+                        <span>A description is required</span>
+                        <span>At least one tag is required</span>
+                    </div>
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" class="btn btn-danger" title="Cerrar" (click)="closeModal()">
+                    Cerrar
+                </button>
+                <button type="submit" class="btn btn-primary" title="Guardar datos" [disabled]="form.invalid">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

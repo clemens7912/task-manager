@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* 
+Define custom colors
+Complementary: Teal
+Neutral: Gray
+Accent: Yellow
+Backgrounds: white
+*/
+@theme {
+    --color-salmon-300: #FF9E8A;
+    --color-salmon-500: #FA8072;
+    --color-salmon-700: #E96A5A;
+}
+

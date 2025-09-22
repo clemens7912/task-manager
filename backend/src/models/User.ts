@@ -1,5 +1,9 @@
-import { Table, Column, Model, DataType, AllowNull, HasMany, BelongsTo, ForeignKey, Default, Index } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, AllowNull, HasMany, BelongsTo, ForeignKey, Default, Index, BelongsToMany, HasOne } from 'sequelize-typescript';
 import { Roles } from './Roles';
+import { Board } from './Board';
+import { BoardUser } from './BoardUser';
+import { Cards } from './Cards';
+import { UserCards } from './UserCards';
 
 @Table({
   timestamps: true,
@@ -8,8 +12,8 @@ import { Roles } from './Roles';
 export class User extends Model {
   
   @Column({
-      type: DataType.STRING,
-      allowNull: false
+    type: DataType.STRING,
+    allowNull: false
   })
   declare name: string;
 
@@ -36,4 +40,13 @@ export class User extends Model {
 
   @BelongsTo(() => Roles)
   declare roles: Roles;
+
+  @BelongsToMany(() => Board, () => BoardUser)
+  declare boards: Board[];
+
+  @HasMany(() => BoardUser)
+	declare boardUsers: BoardUser[];
+
+  @BelongsToMany(() => Cards, () => UserCards)
+  declare cards: Cards[];
 }

@@ -1,7 +1,13 @@
-.item{
+@import './../../../assets/styles/theme.css';
+
+.big-menu .item{
     @apply flex items-center h-full;
 }
 
-.item a {
+.big-menu .item a {
     @apply hover:underline hover:cursor-pointer;
+}
+
+.small-menu .item {
+    @apply w-full flex items-center justify-start py-2 ps-2 text-xl;
 }

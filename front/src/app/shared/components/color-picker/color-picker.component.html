@@ -1,0 +1,11 @@
+<div class="h-[180px] w-[80px] flex flex-col justify-evenly bg-white 
+    border-1 border-gray-200 rounded-xl shadow-xl">
+    @for (colorShades of palette; track colorShades) {
+        <div class="flex items-center justify-evenly w-full">
+            @for (shade of colorShades; track shade) {
+                <button class="w-[20px] h-[20px] bg-{{shade}}" 
+                    (click)="changeColor(shade)" title="{{shade}}"></button>
+            }
+        </div>
+    }
+</div>

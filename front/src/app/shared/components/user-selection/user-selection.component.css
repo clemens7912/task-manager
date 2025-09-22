@@ -1,0 +1,17 @@
+@import './../../../../assets/styles/theme.css';
+
+:host {
+    @apply box-border overflow-y-auto overflow-x-hidden;
+
+    &::-webkit-scrollbar {
+        @apply w-2;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        @apply rounded-xl bg-gray-400/40;
+    }
+
+    &::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+}
