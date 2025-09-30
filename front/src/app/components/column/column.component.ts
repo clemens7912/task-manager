@@ -185,6 +185,7 @@ export class ColumnComponent implements OnInit, AfterViewInit{
       if(!card){
         this.column.cards?.push(newCard);
         this.checkDuplicates = true;
+        return;
       }
 
       //We have updated one
